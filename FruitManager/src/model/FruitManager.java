@@ -26,20 +26,33 @@ public class FruitManager {
     }
 
     /**
-     * Initializes the fruit list with default fruit entries matching the assignment specs.
+     * Initializes the fruit list with default fruit entries.
+     * This method populates the fruitList with a predefined set of fruits,
+     * including their ID, name, price, quantity, and origin.
+     * It is called during the instantiation of the FruitManager to provide initial
+     * data for the system.
      */
     public void availableFruit() {
-        fruitList.add(new Fruit("F01", "Coconut", 2.0, 35, "Vietnam"));
-        fruitList.add(new Fruit("F02", "Orange", 3.0, 30, "US"));
-        fruitList.add(new Fruit("F03", "Apple", 4.0, 50, "Thailand"));
-        fruitList.add(new Fruit("F04", "Grape", 6.0, 20, "France"));
+        fruitList.add(new Fruit("F01", "Apple", 5, 50, "USA"));
+        fruitList.add(new Fruit("F02", "Banana", 3, 40, "Vietnam"));
+        fruitList.add(new Fruit("F03", "Orange", 6, 30, "Spain"));
+        fruitList.add(new Fruit("F04", "Mango", 4, 25, "Thailand"));
+        fruitList.add(new Fruit("F05", "Grape", 8, 20, "France"));
+        fruitList.add(new Fruit("F06", "Pineapple", 7, 18, "Philippines"));
+        fruitList.add(new Fruit("F07", "Coconut", 4, 35, "Vietnam"));
+        fruitList.add(new Fruit("F08", "Watermelon", 10, 15, "China"));
+        fruitList.add(new Fruit("F09", "Papaya", 5, 22, "India"));
+        fruitList.add(new Fruit("F10", "Jackfruit", 6, 12, "Malaysia"));
     }
 
     /**
      * Counts the number of available fruits with a quantity greater than zero.
+     * This method iterates through the fruit list and returns the count of fruits
+     * that have a positive quantity in stock.
+     * 
      * @return The number of fruits available in the inventory.
      */
-    public int getAvailableFruitCount() {
+    public int getFruitList() {
         int count = 0;
         for (Fruit fruit : fruitList) {
             if (fruit.getQuantity() > 0) {
@@ -51,6 +64,9 @@ public class FruitManager {
 
     /**
      * Adds a new fruit to the fruit list.
+     * This method takes a Fruit object and appends it to the fruitList for
+     * inventory management.
+     * 
      * @param fruit The Fruit object to be added to the list.
      */
     public void addFruit(Fruit fruit) {
@@ -58,30 +74,10 @@ public class FruitManager {
     }
 
     /**
-     * Displays all fruits created in the shop (for shop owner review).
-     */
-    public void displayAllFruits() {
-        if (fruitList.isEmpty()) {
-            System.out.println("No fruits created yet!");
-            return;
-        }
-        System.out.println("\nAll created fruits in shop:");
-        System.out.printf("| %-8s | %-15s | %-12s | %-8s | %-8s |%n", "Fruit ID", "Fruit Name", "Origin", "Price", "Quantity");
-        for (Fruit fruit : fruitList) {
-            String priceStr = (fruit.getPrice() % 1 == 0
-                    ? String.format("%.0f$", fruit.getPrice())
-                    : String.format("%.2f$", fruit.getPrice()));
-            System.out.printf("| %-8s | %-15s | %-12s | %-8s | %-8d |%n",
-                    fruit.getFruitID(),
-                    fruit.getFruitName(),
-                    fruit.getOrigin(),
-                    priceStr,
-                    fruit.getQuantity());
-        }
-    }
-
-    /**
-     * Displays the list of available fruits for shopping.
+     * Displays the list of available fruits.
+     * This method prints details of fruits with a quantity greater than zero,
+     * including item number, name, origin, and price.
+     * If no fruits are available, an appropriate message is displayed.
      */
     public void listFruits() {
         if (fruitList.isEmpty()) {
@@ -94,14 +90,11 @@ public class FruitManager {
         for (Fruit fruit : fruitList) {
             if (fruit.getQuantity() > 0) {
                 itemCount++;
-                String priceStr = (fruit.getPrice() % 1 == 0
-                        ? String.format("%.0f$", fruit.getPrice())
-                        : String.format("%.2f$", fruit.getPrice()));
-                System.out.printf("      %-12d %-18s %-16s %s%n",
+                System.out.printf("| %-10d | %-15s | %-11s | %-10s |%n",
                         itemCount,
                         fruit.getFruitName(),
                         fruit.getOrigin(),
-                        priceStr);
+                        fruit.getPrice() + "$");
             }
         }
         if (itemCount == 0) {
@@ -111,6 +104,9 @@ public class FruitManager {
 
     /**
      * Finds a fruit by its item number in the list of available fruits.
+     * This method returns the Fruit object corresponding to the specified item
+     * number, considering only fruits with a quantity greater than zero.
+     * 
      * @param item The item number of the fruit in the list.
      * @return The Fruit object if found; otherwise, null.
      */
@@ -128,13 +124,16 @@ public class FruitManager {
     }
 
     /**
-     * Finds a fruit by its string ID (case-insensitive).
-     * @param id The string ID of the fruit.
+     * Finds a fruit by its string ID.
+     * This method searches the fruit list for a Fruit object with an ID matching
+     * the provided string.
+     * 
+     * @param id The string ID of the fruit (e.g., "F01").
      * @return The Fruit object if found; otherwise, null.
      */
     public Fruit findFruitByIdString(String id) {
         for (Fruit fruit : fruitList) {
-            if (fruit.getFruitID().equalsIgnoreCase(id.trim())) {
+            if (fruit.getFruitID().equals(id)) {
                 return fruit;
             }
         }
@@ -143,9 +142,14 @@ public class FruitManager {
 
     /**
      * Updates the quantity of a fruit in the inventory.
-     * @param fruit The Fruit object to update.
+     * This method checks if the requested quantity can be deducted from the fruit's
+     * current quantity.
+     * If sufficient, the quantity is updated, and the method returns true.
+     * 
+     * @param fruit    The Fruit object to update.
      * @param quantity The quantity to deduct.
-     * @return true if successful; false if insufficient quantity.
+     * @return true if the update is successful; false if there is insufficient
+     *         quantity.
      */
     public boolean updateFruitQuantity(Fruit fruit, int quantity) {
         if (fruit.getQuantity() >= quantity) {
@@ -156,17 +160,21 @@ public class FruitManager {
     }
 
     /**
-     * Places an order for a customer. Stores orders in Hashtable cleanly.
+     * Places an order for a customer.
+     * Each call to this method creates a NEW order for the customer.
+     * Items from the cart are copied to the new order.
+     * The cart is cleared after placing the order.
+     * 
      * @param customer The name of the customer placing the order.
-     * @param cart The list of OrderItem objects in the cart.
+     * @param cart     The list of OrderItem objects in the cart.
      */
     public void placeOrder(String customer, ArrayList<OrderItem> cart) {
         if (!cart.isEmpty()) {
             orderCounter++;
             String orderKey = customer + "#" + orderCounter;
             Order order = new Order(customer);
-            for (OrderItem newItem : cart) {
-                order.addItem(new OrderItem(newItem.getFruit(), newItem.getQuantity()));
+            for (OrderItem cartItem : cart) {
+                order.addItem(new OrderItem(cartItem.getFruit(), cartItem.getQuantity()));
             }
             orders.put(orderKey, order);
             cart.clear();
@@ -174,18 +182,23 @@ public class FruitManager {
     }
 
     /**
-     * Adds a fruit to the shopping cart and merges quantity if the fruit already exists in cart.
-     * @param cart The shopping cart.
-     * @param fruit The Fruit object to add.
-     * @param quantity The quantity to add.
-     * @return true if successful; false if insufficient stock.
+     * Adds a fruit to the shopping cart.
+     * This method checks if the fruit is valid and if there is enough quantity in
+     * stock. If so, it updates the fruit's quantity
+     * and adds a new OrderItem to the cart (merging quantity if fruit already exists in cart).
+     * 
+     * @param cart     The shopping cart (ArrayList of OrderItem objects).
+     * @param fruit    The Fruit object to add to the cart.
+     * @param quantity The quantity of the fruit to add.
+     * @return true if the addition is successful; false if the fruit is invalid or
+     *         there is insufficient quantity.
      */
     public boolean addToCart(ArrayList<OrderItem> cart, Fruit fruit, int quantity) {
         if (fruit == null || !updateFruitQuantity(fruit, quantity)) {
             return false;
         }
         for (OrderItem item : cart) {
-            if (item.getFruit().getFruitID().equalsIgnoreCase(fruit.getFruitID())) {
+            if (item.getFruit().getFruitID().equals(fruit.getFruitID())) {
                 item.setQuantity(item.getQuantity() + quantity);
                 return true;
             }
@@ -195,27 +208,13 @@ public class FruitManager {
     }
 
     /**
-     * Displays all orders in the system matching assignment format.
+     * Retrieves the list of all orders.
+     * This method returns the Hash table containing all orders, with customer names
+     * as keys and Order objects as values.
+     * 
+     * @return The Hash table of orders.
      */
-    public void displayAllOrders() {
-        if (orders.isEmpty()) {
-            System.out.println("No orders available!");
-            return;
-        }
-        for (String key : orders.keySet()) {
-            Order order = orders.get(key);
-            System.out.println("\nCustomer: " + order.getCustomerName());
-            order.printOrder(true);
-        }
+    public Hashtable<String, Order> getOrders() {
+        return orders;
     }
-
-    /**
-     * Prints an invoice preview for the current shopping cart.
-     * @param cart The shopping cart to display.
-     */
-    public void printInvoice(ArrayList<OrderItem> cart) {
-        Order tempOrder = new Order("", cart);
-        tempOrder.printOrder(false);
-    }
-
 }
