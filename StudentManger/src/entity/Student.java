@@ -1,13 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entity;
+
+import java.util.Objects;
 
 /**
  * Entity class đại diện cho đối tượng Sinh viên.
- * 
+ * Pure POJO không chứa logic I/O Console.
+ *
  * @author Administrator
  */
 public class Student implements Comparable<Student> {
@@ -64,24 +62,31 @@ public class Student implements Comparable<Student> {
         return this.studentName.compareToIgnoreCase(otherStudent.studentName);
     }
 
-    /**
-     * Hiển thị thông tin sinh viên kèm số thứ tự (dùng cho bảng Update/Delete).
-     * 
-     * @param orderNumber Số thứ tự bản ghi hiển thị
-     */
-    public void displayStudentWithOrder(int orderNumber) {
-        System.out.printf("| %-3d | %-18s | %-12s | %-13s |%n", orderNumber, studentName, semester, courseName.getLanguage());
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Student other = (Student) obj;
+        return (studentId != null && studentId.equalsIgnoreCase(other.studentId))
+                && (semester != null && semester.equalsIgnoreCase(other.semester))
+                && courseName == other.courseName;
     }
 
-    /**
-     * Hiển thị thông tin sinh viên không kèm số thứ tự (dùng cho Find/Sort).
-     */
-    public void displayStudentInformation() {
-        System.out.printf("| %-18s | %-12s | %-13s |%n", studentName, semester, courseName.getLanguage());
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                studentId == null ? null : studentId.toLowerCase(),
+                semester == null ? null : semester.toLowerCase(),
+                courseName);
     }
 
     @Override
     public String toString() {
-        return String.format("%-18s | %-12s | %-13s", studentName, semester, courseName.getLanguage());
+        return String.format("%-18s | %-12s | %-13s",
+                studentName, semester, courseName.getLanguage());
     }
 }

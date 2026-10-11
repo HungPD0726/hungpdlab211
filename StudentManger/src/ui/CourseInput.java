@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ui;
 
 import entity.Course;
@@ -10,14 +5,15 @@ import utils.Validator;
 
 /**
  * Lớp giao diện tiếp nhận lựa chọn môn học từ người dùng.
- * 
+ * Thuộc tầng View - không chứa business logic.
+ *
  * @author Administrator
  */
 public class CourseInput {
 
     /**
      * Cho phép người dùng chọn môn học qua menu 1, 2, 3 (Java, .Net, C/C++).
-     * 
+     *
      * @return Đối tượng Course tương ứng
      */
     public Course inputCourse() {
@@ -29,8 +25,7 @@ public class CourseInput {
                 "Enter course number (1-3): ",
                 "Course number must be between 1 and 3.",
                 "Please enter a valid integer number.",
-                1, 3
-        );
+                1, 3);
         return Course.getCourseByType(selectedCourseNumber);
     }
 }

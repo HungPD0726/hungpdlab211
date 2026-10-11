@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import entity.Course;
@@ -10,11 +5,15 @@ import entity.Student;
 import java.util.List;
 import java.util.Map;
 import model.StudentManager;
+import ui.CourseInput;
 import ui.StudentInput;
+import ui.StudentView;
 import utils.Validator;
 
 /**
- * Controller trong mô hình MVC: Điều phối tương tác giữa giao diện và StudentManager.
+ * Controller trong mô hình MVC: Điều phối tương tác giữa View và Model.
+ * Nhận input từ người dùng, xử lý luồng, gọi Model cho business logic,
+ * và dùng View để hiển thị kết quả.
  *
  * @author Administrator
  */
@@ -22,6 +21,8 @@ public class StudentController {
 
     private final StudentManager studentManager;
     private final StudentInput studentInput;
+    private final StudentView studentView;
+    private final CourseInput courseInput;
 
     /**
      * Khởi tạo StudentController.
@@ -29,22 +30,28 @@ public class StudentController {
     public StudentController() {
         studentManager = new StudentManager();
         studentInput = new StudentInput();
+        studentView = new StudentView();
+        courseInput = new CourseInput();
     }
 
     /**
-     * Tạo mới sinh viên. Khi tổng số sinh viên >= 10, hỏi người dùng có muốn tiếp tục hay không.
+     * Tạo mới sinh viên. Khi tổng số sinh viên >= 10, hỏi người dùng có muốn
+     * tiếp tục hay không.
      */
     public void createStudent() {
         while (true) {
             Student newStudent = studentInput.inputStudent(studentManager);
             if (!studentManager.addStudent(newStudent)) {
-                System.out.println("This student record (ID, semester, course) already exists!");
+                System.out.println(
+                        "This student record (ID, semester, course) already exists!");
                 continue;
             }
-            System.out.println("Create student successfully! (Total students: " + studentManager.getTotalStudentCount() + ")");
+            int totalCount = studentManager.getTotalStudentCount();
+            System.out.println("Create student successfully! (Total: " + totalCount + ")");
 
-            // Đề bài: "User has to create at least 10 students, if number of students greater than 10, the program shows message: Do you want to continue (Y/N)?"
-            if (studentManager.getTotalStudentCount() >= 10) {
+            // Đề bài: "User has to create at least 10 students,
+            // if number of students > 10, ask Do you want to continue (Y/N)?"
+            if (totalCount >= 10) {
                 String continueChoice = Validator.getString(
                         "Do you want to continue (Y/N)? ",
                         "Please choose Y or N.",
@@ -53,7 +60,8 @@ public class StudentController {
                     break;
                 }
             } else {
-                System.out.println("-> Notice: Minimum 10 students required (Current: " + studentManager.getTotalStudentCount() + ").");
+                System.out.println("-> Notice: Minimum 10 students required (Current: "
+                        + totalCount + ").");
             }
         }
     }
@@ -72,11 +80,7 @@ public class StudentController {
             return;
         }
         studentManager.sortStudentsByName(matchingStudentList);
-        System.out.println("Found Students:");
-        System.out.println("| Student Name       | Semester     | Course Name   |");
-        for (Student currentStudent : matchingStudentList) {
-            currentStudent.displayStudentInformation();
-        }
+        studentView.displayStudents(matchingStudentList);
     }
 
     /**
@@ -92,13 +96,11 @@ public class StudentController {
             System.out.println("Student with ID " + searchStudentId + " not found.");
             return;
         }
-        System.out.println("Found Students:");
-        System.out.println("| No. | Student Name       | Semester     | Course Name   |");
-        for (int index = 0; index < matchingStudentList.size(); index++) {
-            matchingStudentList.get(index).displayStudentWithOrder(index + 1);
-        }
+        studentView.displayStudentsWithOrder(matchingStudentList);
+
         int selectedRecordIndex = Validator.getInt(
-                "Select student record to update/delete (1-" + matchingStudentList.size() + "): ",
+                "Select student record to update/delete (1-"
+                        + matchingStudentList.size() + "): ",
                 "Please choose a number between 1 and " + matchingStudentList.size() + ".",
                 "Invalid integer number.",
                 1, matchingStudentList.size());
@@ -109,7 +111,7 @@ public class StudentController {
                 "Please enter U or D.",
                 "[uUdD]");
         if (userActionChoice.equalsIgnoreCase("U")) {
-            studentManager.updateStudentInformation(selectedStudent);
+            handleUpdateStudent(selectedStudent);
             System.out.println("Student updated successfully!");
         }
         if (userActionChoice.equalsIgnoreCase("D")) {
@@ -119,24 +121,47 @@ public class StudentController {
     }
 
     /**
+     * Xử lý cập nhật thông tin sinh viên.
+     * Controller nhận input từ người dùng và truyền data đã validate xuống Model.
+     *
+     * @param studentToUpdate Bản ghi sinh viên cần cập nhật
+     */
+    private void handleUpdateStudent(Student studentToUpdate) {
+        String updatedName = Validator.getString(
+                "Update Student name [" + studentToUpdate.getStudentName() + "]: ",
+                "Invalid Student name.",
+                "[A-Za-z\\s]*");
+        if (updatedName.isEmpty()) {
+            updatedName = studentToUpdate.getStudentName();
+        }
+
+        String updatedSemester = Validator.getString(
+                "Update Semester [" + studentToUpdate.getSemester() + "]: ",
+                "Invalid Semester (e.g., Fall 2023).",
+                "[a-zA-Z0-9\\s]*");
+        if (updatedSemester.isEmpty()) {
+            updatedSemester = studentToUpdate.getSemester();
+        }
+
+        String confirmationToUpdateCourse = Validator.getString(
+                "Do you want to update the course? (Y/N): ",
+                "Please enter Y or N.",
+                "[yYnN]");
+        Course updatedCourse = null;
+        if (confirmationToUpdateCourse.equalsIgnoreCase("Y")) {
+            updatedCourse = courseInput.inputCourse();
+        }
+
+        studentManager.updateStudentInformation(
+                studentToUpdate, updatedName, updatedSemester, updatedCourse);
+    }
+
+    /**
      * Báo cáo thống kê số lượng khóa học theo từng sinh viên.
      */
     public void displayCourseReport() {
-        Map<String, Map<Course, Integer>> courseReportMap = studentManager.generateCourseReportData();
-        if (courseReportMap.isEmpty()) {
-            System.out.println("No students to report.");
-            return;
-        }
-        System.out.println("Report:");
-        System.out.println("| Student Name       | Course       | Total of Course |");
-        for (Map.Entry<String, Map<Course, Integer>> studentReportEntry : courseReportMap.entrySet()) {
-            String studentName = studentReportEntry.getKey();
-            for (Map.Entry<Course, Integer> courseDetailEntry : studentReportEntry.getValue().entrySet()) {
-                System.out.printf("| %-18s | %-12s | %-15d |%n",
-                        studentName,
-                        courseDetailEntry.getKey().getLanguage(),
-                        courseDetailEntry.getValue());
-            }
-        }
+        Map<String, Map<Course, Integer>> courseReportMap =
+                studentManager.generateCourseReportData();
+        studentView.displayCourseReport(courseReportMap);
     }
 }

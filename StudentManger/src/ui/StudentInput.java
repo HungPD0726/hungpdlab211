@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ui;
 
 import entity.Course;
@@ -12,21 +7,18 @@ import utils.Validator;
 
 /**
  * Lớp chịu trách nhiệm nhập dữ liệu sinh viên từ người dùng.
- * 
+ * Thuộc tầng View - không chứa business logic.
+ *
  * @author Administrator
  */
 public class StudentInput {
 
     private final CourseInput courseInput = new CourseInput();
 
-    public Student inputStudent() {
-        return inputStudent(null);
-    }
-
     /**
      * Nhập thông tin sinh viên mới. Nếu ID đã tồn tại trong StudentManager,
      * tự động nhận diện tên cũ để đảm bảo tính nhất quán (1 ID chỉ có 1 tên).
-     * 
+     *
      * @param studentManager Đối tượng quản lý sinh viên để tra cứu ID
      * @return Đối tượng Student mới
      */
@@ -42,7 +34,8 @@ public class StudentInput {
         }
 
         if (studentName != null) {
-            System.out.println("-> ID already exists in the system. Student Name: " + studentName);
+            System.out.println(
+                    "-> ID already exists in the system. Student Name: " + studentName);
         } else {
             studentName = Validator.getString(
                     "Enter student name: ",

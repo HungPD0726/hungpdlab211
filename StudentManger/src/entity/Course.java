@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entity;
 
 /**
- * Enum định nghĩa 3 khóa học hợp lệ theo đề bài: Java, .Net, C/C++
- * 
+ * Enum định nghĩa 3 khóa học hợp lệ theo đề bài: Java, .Net, C/C++.
+ *
  * @author Administrator
  */
 public enum Course {
@@ -30,12 +25,8 @@ public enum Course {
             case 3:
                 return CPP;
             default:
-                throw new AssertionError("Invalid course type: " + courseType);
+                throw new IllegalArgumentException("Invalid course type: " + courseType);
         }
-    }
-
-    public static Course getCourse(int courseType) {
-        return getCourseByType(courseType);
     }
 
     public String getLanguage() {
