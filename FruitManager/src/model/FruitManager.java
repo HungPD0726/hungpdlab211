@@ -185,7 +185,8 @@ public class FruitManager {
      * Adds a fruit to the shopping cart.
      * This method checks if the fruit is valid and if there is enough quantity in
      * stock. If so, it updates the fruit's quantity
-     * and adds a new OrderItem to the cart (merging quantity if fruit already exists in cart).
+     * and adds a new OrderItem to the cart (merging quantity if fruit already
+     * exists in cart).
      * 
      * @param cart     The shopping cart (ArrayList of OrderItem objects).
      * @param fruit    The Fruit object to add to the cart.
