@@ -5,8 +5,6 @@ import entity.Student;
 import java.util.List;
 import java.util.Map;
 import model.StudentManager;
-import ui.CourseInput;
-import ui.StudentInput;
 import ui.StudentView;
 import utils.Validator;
 
@@ -20,18 +18,24 @@ import utils.Validator;
 public class StudentController {
 
     private final StudentManager studentManager;
-    private final StudentInput studentInput;
     private final StudentView studentView;
-    private final CourseInput courseInput;
 
     /**
-     * Khởi tạo StudentController.
+     * Khởi tạo StudentController mặc định.
      */
     public StudentController() {
-        studentManager = new StudentManager();
-        studentInput = new StudentInput();
-        studentView = new StudentView();
-        courseInput = new CourseInput();
+        this(new StudentManager(), new StudentView());
+    }
+
+    /**
+     * Khởi tạo StudentController hỗ trợ Dependency Injection.
+     *
+     * @param studentManager Model quản lý sinh viên
+     * @param studentView View hiển thị và tiếp nhận giao diện
+     */
+    public StudentController(StudentManager studentManager, StudentView studentView) {
+        this.studentManager = studentManager;
+        this.studentView = studentView;
     }
 
     /**
@@ -40,7 +44,7 @@ public class StudentController {
      */
     public void createStudent() {
         while (true) {
-            Student newStudent = studentInput.inputStudent(studentManager);
+            Student newStudent = studentView.inputStudent(studentManager);
             if (!studentManager.addStudent(newStudent)) {
                 System.out.println(
                         "This student record (ID, semester, course) already exists!");
@@ -149,7 +153,7 @@ public class StudentController {
                 "[yYnN]");
         Course updatedCourse = null;
         if (confirmationToUpdateCourse.equalsIgnoreCase("Y")) {
-            updatedCourse = courseInput.inputCourse();
+            updatedCourse = studentView.inputCourse();
         }
 
         studentManager.updateStudentInformation(

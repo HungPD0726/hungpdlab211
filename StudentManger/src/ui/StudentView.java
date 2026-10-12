@@ -4,14 +4,73 @@ import entity.Course;
 import entity.Student;
 import java.util.List;
 import java.util.Map;
+import model.StudentManager;
+import utils.Validator;
 
 /**
- * Lớp View chịu trách nhiệm hiển thị dữ liệu sinh viên ra console.
- * KHÔNG chứa business logic, chỉ xử lý I/O.
+ * Lớp View hợp nhất quản lý toàn bộ giao diện Console của tính năng Quản lý sinh viên.
+ * Bao gồm cả tiếp nhận dữ liệu đầu vào (Prompt/Input) và hiển thị kết quả (Display).
  *
  * @author Administrator
  */
 public class StudentView {
+
+    /**
+     * Cho phép người dùng chọn môn học qua menu 1, 2, 3 (Java, .Net, C/C++).
+     *
+     * @return Đối tượng Course tương ứng
+     */
+    public Course inputCourse() {
+        System.out.println("Available courses:");
+        System.out.println("1. Java");
+        System.out.println("2. .Net");
+        System.out.println("3. C/C++");
+        int selectedCourseNumber = Validator.getInt(
+                "Enter course number (1-3): ",
+                "Course number must be between 1 and 3.",
+                "Please enter a valid integer number.",
+                1, 3
+        );
+        return Course.getCourseByType(selectedCourseNumber);
+    }
+
+    /**
+     * Nhập thông tin sinh viên mới từ bàn phím.
+     * Tự động nhận diện tên nếu ID đã tồn tại trong hệ thống.
+     *
+     * @param studentManager Đối tượng quản lý sinh viên để tra cứu ID
+     * @return Đối tượng Student mới
+     */
+    public Student inputStudent(StudentManager studentManager) {
+        String studentId = Validator.getString(
+                "Enter student ID (e.g., he187004): ",
+                "Invalid student ID format (alphanumeric only).",
+                "[a-zA-Z0-9]+");
+
+        String studentName = null;
+        if (studentManager != null) {
+            studentName = studentManager.getStudentNameById(studentId);
+        }
+
+        if (studentName != null) {
+            System.out.println(
+                    "-> ID already exists in the system. Student Name: " + studentName);
+        } else {
+            studentName = Validator.getString(
+                    "Enter student name: ",
+                    "Invalid student name (letters and spaces only).",
+                    "[A-Za-z\\s]+");
+        }
+
+        String semester = Validator.getString(
+                "Enter semester (e.g., Fall 2023): ",
+                "Invalid semester.",
+                "[a-zA-Z0-9\\s]+");
+
+        Course selectedCourse = inputCourse();
+
+        return new Student(studentId, studentName, semester, selectedCourse);
+    }
 
     /**
      * Hiển thị danh sách sinh viên kèm số thứ tự (dùng cho Update/Delete).
