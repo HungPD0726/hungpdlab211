@@ -5,6 +5,7 @@ import entity.Student;
 import java.util.List;
 import java.util.Map;
 import model.StudentManager;
+import ui.CourseInput;
 import ui.StudentView;
 import utils.Validator;
 
@@ -19,23 +20,27 @@ public class StudentController {
 
     private final StudentManager studentManager;
     private final StudentView studentView;
+    private final CourseInput courseInput;
 
     /**
      * Khởi tạo StudentController mặc định.
      */
     public StudentController() {
-        this(new StudentManager(), new StudentView());
+        this(new StudentManager(), new StudentView(), new CourseInput());
     }
 
     /**
      * Khởi tạo StudentController hỗ trợ Dependency Injection.
      *
      * @param studentManager Model quản lý sinh viên
-     * @param studentView View hiển thị và tiếp nhận giao diện
+     * @param studentView View hiển thị và tiếp nhận giao diện sinh viên
+     * @param courseInput View tiếp nhận lựa chọn môn học
      */
-    public StudentController(StudentManager studentManager, StudentView studentView) {
+    public StudentController(StudentManager studentManager,
+            StudentView studentView, CourseInput courseInput) {
         this.studentManager = studentManager;
         this.studentView = studentView;
+        this.courseInput = courseInput;
     }
 
     /**
@@ -153,7 +158,7 @@ public class StudentController {
                 "[yYnN]");
         Course updatedCourse = null;
         if (confirmationToUpdateCourse.equalsIgnoreCase("Y")) {
-            updatedCourse = studentView.inputCourse();
+            updatedCourse = courseInput.inputCourse();
         }
 
         studentManager.updateStudentInformation(

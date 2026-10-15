@@ -8,30 +8,29 @@ import model.StudentManager;
 import utils.Validator;
 
 /**
- * Lớp View hợp nhất quản lý toàn bộ giao diện Console của tính năng Quản lý sinh viên.
- * Bao gồm cả tiếp nhận dữ liệu đầu vào (Prompt/Input) và hiển thị kết quả (Display).
+ * Lớp View quản lý toàn bộ giao diện Console của thực thể Student.
+ * Gộp chung cả phần tiếp nhận dữ liệu đầu vào (Prompt/Input) và hiển thị (Display).
  *
  * @author Administrator
  */
 public class StudentView {
 
+    private final CourseInput courseInput;
+
     /**
-     * Cho phép người dùng chọn môn học qua menu 1, 2, 3 (Java, .Net, C/C++).
-     *
-     * @return Đối tượng Course tương ứng
+     * Khởi tạo StudentView với CourseInput mặc định.
      */
-    public Course inputCourse() {
-        System.out.println("Available courses:");
-        System.out.println("1. Java");
-        System.out.println("2. .Net");
-        System.out.println("3. C/C++");
-        int selectedCourseNumber = Validator.getInt(
-                "Enter course number (1-3): ",
-                "Course number must be between 1 and 3.",
-                "Please enter a valid integer number.",
-                1, 3
-        );
-        return Course.getCourseByType(selectedCourseNumber);
+    public StudentView() {
+        this(new CourseInput());
+    }
+
+    /**
+     * Constructor hỗ trợ Dependency Injection.
+     *
+     * @param courseInput Đối tượng tiếp nhận thông tin môn học
+     */
+    public StudentView(CourseInput courseInput) {
+        this.courseInput = courseInput;
     }
 
     /**
@@ -67,7 +66,7 @@ public class StudentView {
                 "Invalid semester.",
                 "[a-zA-Z0-9\\s]+");
 
-        Course selectedCourse = inputCourse();
+        Course selectedCourse = courseInput.inputCourse();
 
         return new Student(studentId, studentName, semester, selectedCourse);
     }
