@@ -82,23 +82,23 @@ public class FruitManager {
     public void listFruits() {
         if (fruitList.isEmpty()) {
             System.out.println("No fruits available!");
-            return;
-        }
-        System.out.println("\nList of Fruit:");
-        System.out.println("| ++ Item ++ | ++ Fruit Name ++ | ++ Origin ++ | ++ Price ++ |");
-        int itemCount = 0;
-        for (Fruit fruit : fruitList) {
-            if (fruit.getQuantity() > 0) {
-                itemCount++;
-                System.out.printf("| %-10d | %-15s | %-11s | %-10s |%n",
-                        itemCount,
-                        fruit.getFruitName(),
-                        fruit.getOrigin(),
-                        fruit.getPrice() + "$");
+        } else {
+            System.out.println("\nList of Fruit:");
+            System.out.println("| ++ Item ++ | ++ Fruit Name ++ | ++ Origin ++ | ++ Price ++ |");
+            int itemCount = 0;
+            for (Fruit fruit : fruitList) {
+                if (fruit.getQuantity() > 0) {
+                    itemCount++;
+                    System.out.printf("| %-10d | %-15s | %-11s | %-10s |%n",
+                            itemCount,
+                            fruit.getFruitName(),
+                            fruit.getOrigin(),
+                            fruit.getPrice() + "$");
+                }
             }
-        }
-        if (itemCount == 0) {
-            System.out.println("No fruits available in stock!");
+            if (itemCount == 0) {
+                System.out.println("No fruits available in stock!");
+            }
         }
     }
 
@@ -111,16 +111,18 @@ public class FruitManager {
      * @return The Fruit object if found; otherwise, null.
      */
     public Fruit findFruitById(int item) {
+        Fruit foundFruit = null;
         int count = 0;
         for (Fruit fruit : fruitList) {
             if (fruit.getQuantity() > 0) {
                 count++;
                 if (count == item) {
-                    return fruit;
+                    foundFruit = fruit;
+                    break;
                 }
             }
         }
-        return null;
+        return foundFruit;
     }
 
     /**
@@ -132,12 +134,14 @@ public class FruitManager {
      * @return The Fruit object if found; otherwise, null.
      */
     public Fruit findFruitByIdString(String id) {
+        Fruit foundFruit = null;
         for (Fruit fruit : fruitList) {
             if (fruit.getFruitID().equals(id)) {
-                return fruit;
+                foundFruit = fruit;
+                break;
             }
         }
-        return null;
+        return foundFruit;
     }
 
     /**
@@ -152,11 +156,12 @@ public class FruitManager {
      *         quantity.
      */
     public boolean updateFruitQuantity(Fruit fruit, int quantity) {
+        boolean isUpdated = false;
         if (fruit.getQuantity() >= quantity) {
             fruit.setQuantity(fruit.getQuantity() - quantity);
-            return true;
+            isUpdated = true;
         }
-        return false;
+        return isUpdated;
     }
 
     /**
@@ -195,17 +200,22 @@ public class FruitManager {
      *         there is insufficient quantity.
      */
     public boolean addToCart(ArrayList<OrderItem> cart, Fruit fruit, int quantity) {
-        if (fruit == null || !updateFruitQuantity(fruit, quantity)) {
-            return false;
-        }
-        for (OrderItem item : cart) {
-            if (item.getFruit().getFruitID().equals(fruit.getFruitID())) {
-                item.setQuantity(item.getQuantity() + quantity);
-                return true;
+        boolean isAdded = false;
+        if (fruit != null && updateFruitQuantity(fruit, quantity)) {
+            boolean isExisted = false;
+            for (OrderItem item : cart) {
+                if (item.getFruit().getFruitID().equals(fruit.getFruitID())) {
+                    item.setQuantity(item.getQuantity() + quantity);
+                    isExisted = true;
+                    break;
+                }
             }
+            if (!isExisted) {
+                cart.add(new OrderItem(fruit, quantity));
+            }
+            isAdded = true;
         }
-        cart.add(new OrderItem(fruit, quantity));
-        return true;
+        return isAdded;
     }
 
     /**

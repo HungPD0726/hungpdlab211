@@ -19,5 +19,6 @@ nbproject/private/
 *.log
 *.tmp
 *.bak
+*Backup/
 .DS_Store
 Thumbs.db

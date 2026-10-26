@@ -66,27 +66,27 @@ public class Controller {
         Hashtable<String, Order> orders = fruitManager.getOrders();
         if (orders.isEmpty()) {
             System.out.println("No orders available!");
-            return;
-        }
-        for (String key : orders.keySet()) {
-            Order order = orders.get(key);
-            System.out.println("\nCustomer: " + order.getCustomerName());
-            System.out.println("Product | Quantity | Price | Amount");
-            int itemNum = 0;
-            int total = 0;
-            for (OrderItem item : order.getItems()) {
-                itemNum++;
-                Fruit fruit = item.getFruit();
-                int amount = item.getAmount();
-                System.out.printf("%d. %-12s %-7d %-6s %d$%n",
-                        itemNum,
-                        fruit.getFruitName(),
-                        item.getQuantity(),
-                        fruit.getPrice() + "$",
-                        amount);
-                total += amount;
+        } else {
+            for (String key : orders.keySet()) {
+                Order order = orders.get(key);
+                System.out.println("\nCustomer: " + order.getCustomerName());
+                System.out.println("Product | Quantity | Price | Amount");
+                int itemNum = 0;
+                int total = 0;
+                for (OrderItem item : order.getItems()) {
+                    itemNum++;
+                    Fruit fruit = item.getFruit();
+                    int amount = item.getAmount();
+                    System.out.printf("%d. %-12s %-7d %-6s %d$%n",
+                            itemNum,
+                            fruit.getFruitName(),
+                            item.getQuantity(),
+                            fruit.getPrice() + "$",
+                            amount);
+                    total += amount;
+                }
+                System.out.println("Total: " + total + "$");
             }
-            System.out.println("Total: " + total + "$");
         }
     }
 

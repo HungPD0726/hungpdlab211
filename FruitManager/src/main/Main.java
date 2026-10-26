@@ -1,8 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-package ui;
+package main;
 
 import controller.Controller;
 import utils.Validator;
@@ -42,7 +38,7 @@ public class Main {
                     System.exit(0);
                     break;
                 default:
-                    throw new AssertionError();
+                    throw new AssertionError("Invalid choice: " + choice);
             }
         }
     }
