@@ -1,9 +1,8 @@
 package entity;
 
 /**
- * Enum định nghĩa 3 khóa học hợp lệ theo đề bài: Java, .Net, C/C++.
  *
- * @author Administrator
+ * @author HP
  */
 public enum Course {
     JAVA("Java"),
@@ -12,7 +11,7 @@ public enum Course {
 
     private final String language;
 
-    Course(String language) {
+    private Course(String language) {
         this.language = language;
     }
 
@@ -25,11 +24,16 @@ public enum Course {
             case 3:
                 return CPP;
             default:
-                throw new IllegalArgumentException("Invalid course type: " + courseType);
+                throw new AssertionError("Invalid: " + courseType);
         }
+    }
+
+    public static Course getCourse(int courseType) {
+        return getCourseByType(courseType);
     }
 
     public String getLanguage() {
         return language;
     }
+
 }

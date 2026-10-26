@@ -7,28 +7,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import ui.CourseInput;
+import utils.Validator;
 
 /**
- * Model class quản lý danh sách sinh viên và các nghiệp vụ dữ liệu.
- * Chỉ chứa business logic, KHÔNG chứa I/O.
  *
- * @author Administrator
+ * @author HP
  */
-public class StudentManager {
+public final class StudentManager {
 
     private final List<Student> studentList = new ArrayList<>();
+    private final CourseInput courseInput = new CourseInput();
 
-    /**
-     * Khởi tạo StudentManager và nạp dữ liệu mẫu ban đầu.
-     */
     public StudentManager() {
-        initializeSampleStudentData();
+        avaiableStudent();
     }
 
-    /**
-     * Nạp sẵn danh sách sinh viên mẫu theo đề bài.
-     */
-    private void initializeSampleStudentData() {
+    public void avaiableStudent() {
         studentList.add(new Student("he187001", "Nguyen Van A", "Fall 2023", Course.JAVA));
         studentList.add(new Student("he187001", "Nguyen Van A", "Fall 2024", Course.JAVA));
         studentList.add(new Student("he187002", "Tran Thi B", "Spring 2023", Course.DOT_NET));
@@ -41,78 +36,80 @@ public class StudentManager {
         studentList.add(new Student("he187009", "Vo Van I", "Spring 2023", Course.DOT_NET));
     }
 
-    /**
-     * Lấy tổng số lượng sinh viên trong hệ thống.
-     *
-     * @return Tổng số lượng sinh viên
-     */
-    public int getTotalStudentCount() {
+    public int getTotalStudent() {
         return studentList.size();
     }
 
-    /**
-     * Lấy tên sinh viên theo ID nếu đã tồn tại trong danh sách.
-     *
-     * @param studentId Mã sinh viên cần tìm
-     * @return Tên sinh viên nếu tìm thấy, ngược lại null
-     */
-    public String getStudentNameById(String studentId) {
+    public String getStudentById(String id) {
+        String studentName = null;
         for (Student existingStudent : studentList) {
-            if (existingStudent.getId().equalsIgnoreCase(studentId)) {
-                return existingStudent.getStudentName();
+            if (existingStudent.getId().equalsIgnoreCase(id)) {
+                studentName = existingStudent.getStudentName();
+                break;
             }
         }
-        return null;
+        return studentName;
     }
 
-    /**
-     * Đồng bộ tên sinh viên cho tất cả bản ghi có cùng ID.
-     *
-     * @param studentId Mã sinh viên
-     * @param updatedStudentName Tên mới cần cập nhật
-     */
-    public void updateStudentNameById(String studentId, String updatedStudentName) {
+    public void updateStudentById(String id, String updateStudentName) {
         for (Student existingStudent : studentList) {
-            if (existingStudent.getId().equalsIgnoreCase(studentId)) {
-                existingStudent.setStudentName(updatedStudentName);
+            if (existingStudent.getId().equalsIgnoreCase(id)) {
+                existingStudent.setStudentName(updateStudentName);
             }
         }
     }
 
-    /**
-     * Kiểm tra xem bản ghi sinh viên đã tồn tại chưa (dựa trên equals của Student).
-     *
-     * @param newStudent Đối tượng sinh viên mới cần kiểm tra
-     * @return true nếu trùng lặp, ngược lại false
-     */
-    public boolean isDuplicateRecord(Student newStudent) {
-        return studentList.contains(newStudent);
+    public boolean isDuplicatedStudent(Student newStudent) {
+        boolean isDuplicated = false;
+        for (Student existingStudent : studentList) {
+            if (existingStudent.getId().equalsIgnoreCase(newStudent.getId())
+                    && existingStudent.getStudentName().equalsIgnoreCase(newStudent.getStudentName())
+                    && existingStudent.getSemester().equalsIgnoreCase(newStudent.getSemester())
+                    && existingStudent.getCourseName() == newStudent.getCourseName()) {
+                isDuplicated = true;
+                break;
+            }
+        }
+        return isDuplicated;
     }
 
-    /**
-     * Thêm sinh viên mới vào danh sách nếu không trùng lặp.
-     *
-     * @param newStudent Đối tượng sinh viên cần thêm
-     * @return true nếu thêm thành công, false nếu trùng lặp
-     */
     public boolean addStudent(Student newStudent) {
-        if (isDuplicateRecord(newStudent)) {
-            return false;
+        boolean isAdded = false;
+        if (!isDuplicatedStudent(newStudent)) {
+            isAdded = studentList.add(newStudent);
         }
-        return studentList.add(newStudent);
+        return isAdded;
     }
 
-    /**
-     * Tìm kiếm sinh viên theo tên hoặc một phần tên.
-     *
-     * @param searchKeyword Từ khóa tìm kiếm
-     * @return Danh sách sinh viên thỏa mãn
-     */
-    public List<Student> findStudentsByName(String searchKeyword) {
+    public boolean deleteStudent(Student deleteStudent) {
+        return studentList.remove(deleteStudent);
+    }
+
+    public void displayAllStudent() {
+        if (studentList.isEmpty()) {
+            System.out.println("No students found.");
+        } else {
+            System.out.println("| No. | Student Name   | Semester    | Course Name   |");
+            for (int i = 0; i < studentList.size(); i++) {
+                studentList.get(i).displayStudentWithOrder(i + 1);
+            }
+        }
+    }
+
+    public List<Student> findStudentByName(String keyName) {
         List<Student> foundStudentList = new ArrayList<>();
         for (Student currentStudent : studentList) {
-            if (currentStudent.getStudentName().toLowerCase()
-                    .contains(searchKeyword.toLowerCase())) {
+            if (currentStudent.getStudentName().toLowerCase().contains(keyName.toLowerCase())) {
+                foundStudentList.add(currentStudent);
+            }
+        }
+        return foundStudentList;
+    }
+
+    public List<Student> findStudentById(String id) {
+        List<Student> foundStudentList = new ArrayList<>();
+        for (Student currentStudent : studentList) {
+            if (currentStudent.getId().equalsIgnoreCase(id)) {
                 foundStudentList.add(currentStudent);
             }
         }
@@ -128,69 +125,41 @@ public class StudentManager {
         Collections.sort(studentListToSort);
     }
 
-    /**
-     * Tìm kiếm tất cả bản ghi của một sinh viên theo ID.
-     *
-     * @param studentId Mã sinh viên cần tìm
-     * @return Danh sách các bản ghi của sinh viên
-     */
-    public List<Student> findStudentsById(String studentId) {
-        List<Student> matchingStudentList = new ArrayList<>();
-        for (Student currentStudent : studentList) {
-            if (currentStudent.getId().equalsIgnoreCase(studentId)) {
-                matchingStudentList.add(currentStudent);
-            }
-        }
-        return matchingStudentList;
-    }
-
-    /**
-     * Cập nhật thông tin cho một bản ghi sinh viên.
-     * Chỉ nhận data đã được validate, không nhận input trực tiếp từ console.
-     *
-     * @param studentToUpdate Bản ghi sinh viên cần cập nhật
-     * @param updatedName Tên mới (null hoặc empty = không cập nhật)
-     * @param updatedSemester Học kỳ mới (null hoặc empty = không cập nhật)
-     * @param updatedCourse Khóa học mới (null = không cập nhật)
-     */
-    public void updateStudentInformation(Student studentToUpdate, String updatedName,
-            String updatedSemester, Course updatedCourse) {
-        if (updatedName != null && !updatedName.isEmpty()) {
-            updateStudentNameById(studentToUpdate.getId(), updatedName);
+    public void updateStudentInformation(Student updateStudent) {
+        String updateName = Validator.getString(
+                "Update Student name [" + updateStudent.getStudentName() + "]: ",
+                "Invalid student ID format.",
+                "[a-zA-Z\\s]+");
+        if (!updateName.isEmpty()) {
+            updateStudentById(updateStudent.getId(), updateName);
         }
 
-        if (updatedSemester != null && !updatedSemester.isEmpty()) {
-            studentToUpdate.setSemester(updatedSemester);
+        String updateSemester = Validator.getString(
+                "Update Semester [" + updateStudent.getSemester() + "]: ",
+                "Invalid semester format.",
+                "[a-zA-Z\\s]+");
+        if (!updateSemester.isEmpty()) {
+            updateStudent.setSemester(updateSemester);
         }
-
-        if (updatedCourse != null) {
-            studentToUpdate.setCourseName(updatedCourse);
+        String confirmInformation = Validator.getString(
+                "Do you want to update course ? (Y/N): ",
+                "Please Y or N",
+                "[yYNn]");
+        if (confirmInformation.equalsIgnoreCase("Y")) {
+            Course updateCourse = courseInput.courseInput();
+            updateStudent.setCourseName(updateCourse);
         }
     }
 
-    /**
-     * Xóa một bản ghi sinh viên khỏi danh sách.
-     *
-     * @param studentToDelete Bản ghi cần xóa
-     * @return true nếu xóa thành công
-     */
-    public boolean deleteStudent(Student studentToDelete) {
-        return studentList.remove(studentToDelete);
-    }
-
-    /**
-     * Thống kê số lượng khóa học theo từng sinh viên.
-     *
-     * @return Map lưu trữ kết quả thống kê
-     */
-    public Map<String, Map<Course, Integer>> generateCourseReportData() {
-        Map<String, Map<Course, Integer>> courseReportMap = new HashMap<>();
+    public Map<String, Map<Course, Integer>> generrateCourseData() {
+        Map<String, Map<Course, Integer>> courseReport = new HashMap<>();
         for (Student currentStudent : studentList) {
             String currentStudentName = currentStudent.getStudentName();
             Course currentStudentCourse = currentStudent.getCourseName();
-            courseReportMap.computeIfAbsent(currentStudentName, key -> new HashMap<>())
-                          .merge(currentStudentCourse, 1, Integer::sum);
+            courseReport.computeIfAbsent(currentStudentName, keyName -> new HashMap<>())
+                    .merge(currentStudentCourse, 1, Integer::sum);
         }
-        return courseReportMap;
+        return courseReport;
     }
+
 }

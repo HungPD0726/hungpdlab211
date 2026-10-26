@@ -1,16 +1,12 @@
 package entity;
 
-import java.util.Objects;
-
 /**
- * Entity class đại diện cho đối tượng Sinh viên.
- * Pure POJO không chứa logic I/O Console.
  *
- * @author Administrator
+ * @author HP
  */
 public class Student implements Comparable<Student> {
 
-    private String studentId;
+    private String id;
     private String studentName;
     private String semester;
     private Course courseName;
@@ -18,19 +14,19 @@ public class Student implements Comparable<Student> {
     public Student() {
     }
 
-    public Student(String studentId, String studentName, String semester, Course courseName) {
-        this.studentId = studentId;
+    public Student(String id, String studentName, String semester, Course courseName) {
+        this.id = id;
         this.studentName = studentName;
         this.semester = semester;
         this.courseName = courseName;
     }
 
     public String getId() {
-        return studentId;
+        return id;
     }
 
-    public void setId(String studentId) {
-        this.studentId = studentId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getStudentName() {
@@ -57,36 +53,22 @@ public class Student implements Comparable<Student> {
         this.courseName = courseName;
     }
 
-    @Override
-    public int compareTo(Student otherStudent) {
-        return this.studentName.compareToIgnoreCase(otherStudent.studentName);
+    public void displayStudentWithOrder(int number) {
+        System.out.printf("| %-3d |%-18s | %-12s | %-13s|%n", number, studentName, semester, courseName.getLanguage());
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        Student other = (Student) obj;
-        return (studentId != null && studentId.equalsIgnoreCase(other.studentId))
-                && (semester != null && semester.equalsIgnoreCase(other.semester))
-                && courseName == other.courseName;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                studentId == null ? null : studentId.toLowerCase(),
-                semester == null ? null : semester.toLowerCase(),
-                courseName);
+    public void displayStudentInfor() {
+        System.out.printf("| %-18s | %-12s | %-13s|%n", studentName, semester, courseName.getLanguage());
     }
 
     @Override
     public String toString() {
-        return String.format("%-18s | %-12s | %-13s",
-                studentName, semester, courseName.getLanguage());
+        return String.format("| %-18s | %-12s | %-13s", studentName, semester, courseName.getLanguage());
     }
+
+    @Override
+    public int compareTo(Student newStudent) {
+        return this.studentName.compareToIgnoreCase(newStudent.studentName);
+    }
+
 }

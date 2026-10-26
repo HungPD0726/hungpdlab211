@@ -5,172 +5,105 @@ import entity.Student;
 import java.util.List;
 import java.util.Map;
 import model.StudentManager;
-import ui.CourseInput;
-import ui.StudentView;
+import ui.StudentInput;
 import utils.Validator;
 
 /**
- * Controller trong mô hình MVC: Điều phối tương tác giữa View và Model.
- * Nhận input từ người dùng, xử lý luồng, gọi Model cho business logic,
- * và dùng View để hiển thị kết quả.
  *
- * @author Administrator
+ * @author HP
  */
 public class StudentController {
 
-    private final StudentManager studentManager;
-    private final StudentView studentView;
-    private final CourseInput courseInput;
+    private final StudentManager studentManager = new StudentManager();
+    private final StudentInput studentInput = new StudentInput();
 
-    /**
-     * Khởi tạo StudentController mặc định.
-     */
-    public StudentController() {
-        this(new StudentManager(), new StudentView(), new CourseInput());
-    }
-
-    /**
-     * Khởi tạo StudentController hỗ trợ Dependency Injection.
-     *
-     * @param studentManager Model quản lý sinh viên
-     * @param studentView View hiển thị và tiếp nhận giao diện sinh viên
-     * @param courseInput View tiếp nhận lựa chọn môn học
-     */
-    public StudentController(StudentManager studentManager,
-            StudentView studentView, CourseInput courseInput) {
-        this.studentManager = studentManager;
-        this.studentView = studentView;
-        this.courseInput = courseInput;
-    }
-
-    /**
-     * Tạo mới sinh viên. Khi tổng số sinh viên >= 10, hỏi người dùng có muốn
-     * tiếp tục hay không.
-     */
     public void createStudent() {
         while (true) {
-            Student newStudent = studentView.inputStudent(studentManager);
+            Student newStudent = studentInput.inputStudent(studentManager);
             if (!studentManager.addStudent(newStudent)) {
-                System.out.println(
-                        "This student record (ID, semester, course) already exists!");
+                System.out.println("Student already exists!");
                 continue;
             }
-            int totalCount = studentManager.getTotalStudentCount();
-            System.out.println("Create student successfully! (Total: " + totalCount + ")");
+            System.out.println("Create successfully.");
 
-            // Đề bài: "User has to create at least 10 students,
-            // if number of students > 10, ask Do you want to continue (Y/N)?"
-            if (totalCount >= 10) {
-                String continueChoice = Validator.getString(
+            if (studentManager.getTotalStudent() >= 10) {
+                String choice = Validator.getString(
                         "Do you want to continue (Y/N)? ",
                         "Please choose Y or N.",
                         "[yYnN]");
-                if (continueChoice.equalsIgnoreCase("N")) {
+                if (choice.equalsIgnoreCase("N")) {
                     break;
+                } else {
+                    System.out.println("Current total students: " + studentManager.getTotalStudent());
                 }
-            } else {
-                System.out.println("-> Notice: Minimum 10 students required (Current: "
-                        + totalCount + ").");
             }
         }
     }
 
-    /**
-     * Tìm kiếm sinh viên theo tên và hiển thị danh sách đã sắp xếp.
-     */
     public void findAndSortStudents() {
-        String searchKeyword = Validator.getString(
-                "Enter name to search: ",
-                "Invalid name.",
-                "[A-Za-z\\s]+");
-        List<Student> matchingStudentList = studentManager.findStudentsByName(searchKeyword);
-        if (matchingStudentList.isEmpty()) {
-            System.out.println("No students found with name containing: " + searchKeyword);
+        String keyWord = Validator.getString("Enter name: ", "Invalid name format.", "[A-Za-z\\s]+");
+        List<Student> findList = studentManager.findStudentByName(keyWord);
+        if (findList.isEmpty()) {
+            System.out.println("Cannot find student with name: " + keyWord);
             return;
         }
-        studentManager.sortStudentsByName(matchingStudentList);
-        studentView.displayStudents(matchingStudentList);
+        studentManager.sortStudentsByName(findList);
+        System.out.println("Found students:");
+        System.out.printf("| %-18s | %-12s | %-13s|%n", "Student Name", "Semester", "Course Name");
+        for (Student currentStudent : findList) {
+            currentStudent.displayStudentInfor();
+        }
     }
 
-    /**
-     * Tìm sinh viên theo ID và cho phép chọn Update (U) hoặc Delete (D).
-     */
     public void updateOrDeleteStudent() {
         String searchStudentId = Validator.getString(
                 "Enter Student ID (e.g., he187004): ",
                 "Invalid ID format (alphanumeric only).",
                 "[a-zA-Z0-9]+");
-        List<Student> matchingStudentList = studentManager.findStudentsById(searchStudentId);
-        if (matchingStudentList.isEmpty()) {
-            System.out.println("Student with ID " + searchStudentId + " not found.");
+        List<Student> findList = studentManager.findStudentById(searchStudentId);
+        if (findList.isEmpty()) {
+            System.out.println("Cannot find student with ID: " + searchStudentId);
             return;
         }
-        studentView.displayStudentsWithOrder(matchingStudentList);
-
-        int selectedRecordIndex = Validator.getInt(
-                "Select student record to update/delete (1-"
-                        + matchingStudentList.size() + "): ",
-                "Please choose a number between 1 and " + matchingStudentList.size() + ".",
-                "Invalid integer number.",
-                1, matchingStudentList.size());
-        Student selectedStudent = matchingStudentList.get(selectedRecordIndex - 1);
-
-        String userActionChoice = Validator.getString(
-                "Do you want to Update (U) or Delete (D) student? ",
+        System.out.println("Found students:");
+        System.out.printf("| %-3s |%-18s | %-12s | %-13s|%n", "No.", "Student Name", "Semester", "Course Name");
+        for (int i = 0; i < findList.size(); i++) {
+            findList.get(i).displayStudentWithOrder(i + 1);
+        }
+        int selectRecordIndex = Validator.getInt("Select record (1 - " + findList.size() + "): ",
+                "Please choose from 1 to " + findList.size(), "Invalid integer input.", 1, findList.size());
+        Student selectStudent = findList.get(selectRecordIndex - 1);
+        String choice = Validator.getString("Do you want to Update (U) or Delete (D) student? ",
                 "Please enter U or D.",
                 "[uUdD]");
-        if (userActionChoice.equalsIgnoreCase("U")) {
-            handleUpdateStudent(selectedStudent);
-            System.out.println("Student updated successfully!");
-        }
-        if (userActionChoice.equalsIgnoreCase("D")) {
-            studentManager.deleteStudent(selectedStudent);
-            System.out.println("Student deleted successfully!");
+        if (choice.equalsIgnoreCase("U")) {
+            studentManager.updateStudentInformation(selectStudent);
+            System.out.println("Update successfully.");
+        } else if (choice.equalsIgnoreCase("D")) {
+            studentManager.deleteStudent(selectStudent);
+            System.out.println("Delete successfully.");
         }
     }
 
     /**
-     * Xử lý cập nhật thông tin sinh viên.
-     * Controller nhận input từ người dùng và truyền data đã validate xuống Model.
-     *
-     * @param studentToUpdate Bản ghi sinh viên cần cập nhật
-     */
-    private void handleUpdateStudent(Student studentToUpdate) {
-        String updatedName = Validator.getString(
-                "Update Student name [" + studentToUpdate.getStudentName() + "]: ",
-                "Invalid Student name.",
-                "[A-Za-z\\s]*");
-        if (updatedName.isEmpty()) {
-            updatedName = studentToUpdate.getStudentName();
-        }
-
-        String updatedSemester = Validator.getString(
-                "Update Semester [" + studentToUpdate.getSemester() + "]: ",
-                "Invalid Semester (e.g., Fall 2023).",
-                "[a-zA-Z0-9\\s]*");
-        if (updatedSemester.isEmpty()) {
-            updatedSemester = studentToUpdate.getSemester();
-        }
-
-        String confirmationToUpdateCourse = Validator.getString(
-                "Do you want to update the course? (Y/N): ",
-                "Please enter Y or N.",
-                "[yYnN]");
-        Course updatedCourse = null;
-        if (confirmationToUpdateCourse.equalsIgnoreCase("Y")) {
-            updatedCourse = courseInput.inputCourse();
-        }
-
-        studentManager.updateStudentInformation(
-                studentToUpdate, updatedName, updatedSemester, updatedCourse);
-    }
-
-    /**
-     * Báo cáo thống kê số lượng khóa học theo từng sinh viên.
+     * Displays a statistical report of course enrollments per student.
      */
     public void displayCourseReport() {
-        Map<String, Map<Course, Integer>> courseReportMap =
-                studentManager.generateCourseReportData();
-        studentView.displayCourseReport(courseReportMap);
+        Map<String, Map<Course, Integer>> courseReportMap = studentManager.generrateCourseData();
+        if (courseReportMap.isEmpty()) {
+            System.out.println("No students to report.");
+            return;
+        }
+
+        System.out.println("Report:");
+        System.out.println("| Student Name       | Course       | Total of Course |");
+        courseReportMap.forEach((studentName, courses)
+                -> courses.forEach((course, total)
+                        -> System.out.printf("| %-18s | %-12s | %-15d |%n",
+                                studentName,
+                                course.getLanguage(),
+                                total)
+                )
+        );
     }
 }
