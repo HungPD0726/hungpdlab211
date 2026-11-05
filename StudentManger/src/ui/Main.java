@@ -9,14 +9,32 @@ import controller.StudentController;
 import utils.Validator;
 
 /**
- * Lớp khởi chạy ứng dụng Quản lý sinh viên.
+ * Lớp khởi chạy ứng dụng Quản lý sinh viên (Student Management System).
+ * Chứa hàm main đóng vai trò là điểm vào (entry point) của toàn bộ chương trình.
  * 
  * @author Administrator
  */
 public class Main {
 
     /**
-     * @param args the command line arguments
+     * Khởi tạo đối tượng Main phục vụ chạy chương trình.
+     */
+    public Main() {
+    }
+
+    /**
+     * Điểm bắt đầu thực thi chương trình (Entry Point).
+     * <p>
+     * Phương thức thực hiện các nhiệm vụ:
+     * 1. Khởi tạo đối tượng {@link StudentController} để điều phối các chức năng.
+     * 2. Vận hành vòng lặp menu chính để người dùng chọn các chức năng từ 1 đến 5:
+     *    - 1: Create (Tạo mới sinh viên, tối thiểu 10 bản ghi)
+     *    - 2: Find and Sort (Tìm kiếm theo tên và sắp xếp tăng dần theo bảng chữ cái A-Z)
+     *    - 3: Update/Delete (Tìm theo ID để cập nhật thông tin hoặc xóa bản ghi)
+     *    - 4: Report (Thống kê tổng số khóa học mà từng sinh viên đã học)
+     *    - 5: Exit (Thoát khỏi chương trình)
+     * 
+     * @param args Mảng các tham số dòng lệnh truyền vào chương trình (command line arguments)
      */
     public static void main(String[] args) {
         StudentController studentController = new StudentController();

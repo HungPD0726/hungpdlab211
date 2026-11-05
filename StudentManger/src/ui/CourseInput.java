@@ -9,16 +9,23 @@ import entity.Course;
 import utils.Validator;
 
 /**
- * Lớp giao diện tiếp nhận lựa chọn môn học từ người dùng.
+ * Lớp giao diện tiếp nhận và xử lý việc lựa chọn môn học từ người dùng.
  * 
  * @author Administrator
  */
 public class CourseInput {
 
     /**
-     * Cho phép người dùng chọn môn học qua menu 1, 2, 3 (Java, .Net, C/C++).
+     * Khởi tạo đối tượng CourseInput để hỗ trợ việc hiển thị và nhập lựa chọn môn học.
+     */
+    public CourseInput() {
+    }
+
+    /**
+     * Hiển thị danh sách các môn học có sẵn và yêu cầu người dùng chọn qua menu (1: Java, 2: .Net, 3: C/C++).
+     * Sử dụng phương thức {@link Validator#getInt} để đảm bảo người dùng chỉ nhập số nguyên từ 1 đến 3.
      * 
-     * @return Đối tượng Course tương ứng
+     * @return Đối tượng {@link Course} tương ứng với lựa chọn của người dùng
      */
     public Course inputCourse() {
         System.out.println("Available courses:");
